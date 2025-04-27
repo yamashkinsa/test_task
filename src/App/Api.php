@@ -2,7 +2,7 @@
 
 namespace App;
 
-use Interfaces\ValidatorInterface;
+use App\Validator;
 
 /**
  * Класс для работы с API
@@ -12,9 +12,9 @@ use Interfaces\ValidatorInterface;
  */
 class Api
 {
-    private ValidatorInterface $validator;
+    private Validator $validator;
 
-    public function __construct(ValidatorInterface $validator)
+    public function __construct(Validator $validator)
     {
         $this->validator = $validator;
     }
@@ -29,10 +29,10 @@ class Api
      */
     public function get_api_path(array $array, string $template): string
     {
-        // Валидируем данные
+        // Валидация данных
         $this->validator->validate($array, $template);
 
-        // Заменяем плейсхолдеры
+        // Замена плейсхолдеров
         $result = $template;
 
         foreach ($array as $key => $value) {

@@ -2,15 +2,13 @@
 
 namespace App;
 
-use Interfaces\ValidatorInterface;
-
 /**
  * Класс для валидации данных
  *
  * @author		yamashkinsa
  * @version		v.1.0 (27/04/2025)
  */
-class Validator implements ValidatorInterface
+class Validator
 {
     private array $allowed_fields;
 
