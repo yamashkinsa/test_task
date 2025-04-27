@@ -2,6 +2,8 @@
 
 namespace App;
 
+use Interfaces\ValidatorInterface;
+
 /**
  * Класс для работы с API
  *
@@ -10,34 +12,33 @@ namespace App;
  */
 class Api
 {
-    private Validator $validator;
+    private ValidatorInterface $validator;
 
-    public function __construct()
+    public function __construct(ValidatorInterface $validator)
     {
-        $this->validator = new Validator();
+        $this->validator = $validator;
     }
 
     /**
-     * Заполняет строковый шаблон template данными из массива
+     * Заполняет строковый шаблон данными из массива
      *
-     * @author		User Name
-     * @version		v.1.0 (27/04/2025)
-     * @param		{object} array
-     * @param		{string} template
-     * @return		{string}
+     * @param array $array
+     * @param string $template
+     * @return string
+     * @throws \Exception
      */
     public function get_api_path(array $array, string $template): string
     {
-        $this->validator->validate($array);
+        // Валидируем данные
+        $this->validator->validate($array, $template);
 
+        // Заменяем плейсхолдеры
         $result = $template;
 
-        foreach ($array as $key => $value)
-        {
+        foreach ($array as $key => $value) {
             $placeholder = '%' . $key . '%';
 
-            if (strpos($result, $placeholder) !== false)
-            {
+            if (strpos($result, $placeholder) !== false) {
                 $result = str_replace($placeholder, rawurlencode((string)$value), $result);
             }
         }

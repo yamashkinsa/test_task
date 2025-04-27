@@ -2,13 +2,14 @@
 
 require_once 'autoload.php';
 
-use App\Api;
+use \App\Api;
+use \App\Validator;
 
 $user = [
-    'id'		=> 20,
-    'name'		=> 'John Dow',
-    'role'		=> 'QA',
-    'salary'	=> 100
+    'id' => 20,
+    'name' => 'John Dow',
+    'role' => 'QA',
+    'salary' => 100
 ];
 
 $api_path_templates = [
@@ -17,7 +18,13 @@ $api_path_templates = [
     "/api/items/%id%/%salary%"
 ];
 
-$api = new Api();
+$validator = new Validator([
+    'id' => 'integer',
+    'name' => 'string',
+    'role' => 'string',
+    'salary' => 'integer'
+]);
+$api = new Api($validator);
 
 $api_paths = array_map(function ($api_path_template) use ($api, $user) {
     return $api->get_api_path($user, $api_path_template);

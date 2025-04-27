@@ -2,7 +2,7 @@
 
 namespace App;
 
-use Config;
+use Interfaces\ValidatorInterface;
 
 /**
  * Класс для валидации данных
@@ -10,39 +10,50 @@ use Config;
  * @author		yamashkinsa
  * @version		v.1.0 (27/04/2025)
  */
-class Validator
+class Validator implements ValidatorInterface
 {
-    private array $rules;
+    private array $allowed_fields;
 
-    public function __construct()
+    public function __construct($config)
     {
-        $this->rules = Config\Validator::RULES;
+        $this->allowed_fields = $config;
     }
 
     /**
-     * Проверяет данные на соответствие правилам
+     * Валидирует данные
      *
      * @param array $data
-     * @return bool
+     * @param string|null $template
+     * @return void
      * @throws \Exception
      */
-    public function validate(array $data): bool
+    public function validate(array $data, ?string $template = null): void
     {
-        foreach ($data as $key => $value)
-        {
-            if (!array_key_exists($key, $this->rules))
-            {
+        // Проверяем допустимые поля
+        foreach ($data as $key => $value) {
+            if (!array_key_exists($key, $this->allowed_fields)) {
                 throw new \Exception("Field '{$key}' is not allowed.");
             }
 
-            $type = gettype($value);
+            // Проверка типа
+            $expectedType = $this->allowed_fields[$key];
 
-            if ($type !== $this->rules[$key])
-            {
-                throw new \Exception("Field '{$key}' must be of type '{$this->rules[$key]}', '{$type}' given.");
+            if (gettype($value) !== $expectedType) {
+                throw new \Exception("Field '{$key}' must be of type '{$expectedType}', '" . gettype($value) . "' given.");
             }
         }
 
-        return true;
+        // Проверяем наличие всех полей из шаблона
+        if ($template !== null) {
+            preg_match_all('/%(\w+)%/', $template, $matches);
+
+            if (!empty($matches[1])) {
+                foreach ($matches[1] as $fieldName) {
+                    if (!array_key_exists($fieldName, $data)) {
+                        throw new \Exception("Field '{$fieldName}' is missing in data array.");
+                    }
+                }
+            }
+        }
     }
 }
